@@ -1,59 +1,90 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Product API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Partners:** Juan Miguel S. Evangelista, N/A (Solo)
+**Section:** IT1E
+**Resource:** Product
 
-## About Laravel
+## Setup
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Follow these steps to run the project from a fresh clone:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Clone the repository:
+```
+   git clone https://github.com/Sujinomi/cit3102-m5-product.git
+```
+2. Go into the project folder:
+```
+   cd cit3102-m5-product
+```
+3. Install the dependencies:
+```
+   composer install
+```
+4. Copy the environment file:
+```
+   copy .env.example .env
+```
+5. Generate the app key:
+```
+   php artisan key:generate
+```
+6. Create the database tables (say **yes** if it asks to create the SQLite file):
+```
+   php artisan migrate
+```
+7. Start the server:
+```
+   php artisan serve
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The API will run at `http://127.0.0.1:8000`. Send the header `Accept: application/json` with every request.
 
-## Learning Laravel
+## Routes
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Verb | Path | What it does | Needs token? |
+|---|---|---|---|
+| POST | /api/register | Creates a new user and returns a token | No |
+| POST | /api/login | Logs in a user and returns a token | No |
+| POST | /api/logout | Deletes the current token | Yes |
+| GET | /api/me | Shows the logged-in user | Yes |
+| GET | /api/products | Lists all products (can filter by name, category, price, stock) | Yes |
+| POST | /api/products | Creates a new product | Yes |
+| GET | /api/products/{product} | Shows one product | Yes |
+| PUT | /api/products/{product} | Updates a product | Yes |
+| DELETE | /api/products/{product} | Deletes a product | Yes |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Screenshots
 
-## Laravel Sponsors
+**1. POST /api/register (201)**
+![01-register](screenshots/01-register.png)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**2. POST /api/login (200)**
+![02-login](screenshots/02-login.png)
 
-### Premium Partners
+**3. GET /api/products with no token (401)**
+![03-no auth](screenshots/03-no-auth.png)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**4. GET /api/products with token (200)**
+![04-token](screenshots/04-token.png)
 
-## Contributing
+**5. POST /api/products with valid data (201)**
+![05-create](screenshots/05-create.png)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**6. POST /api/products with a missing field (422)**
+![06-missing field](screenshots/06-missing-field.png)
 
-## Code of Conduct
+**7. GET /api/products/1 (200)**
+![07-first product](screenshots/07-first-product.png)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**8. GET /api/products/99999 (404)**
+![08-error](screenshots/08-error.png)
 
-## Security Vulnerabilities
+**9. PUT /api/products/1 with changed data (200)**
+![09-update](screenshots/09-update.png)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**10. DELETE /api/products/1 (204)**
+![10-delete](screenshots/10-delete.png)
 
-## License
+## Why does DELETE return 204 and not 200?
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+When a product is deleted, it no longer exists, so there is nothing left for the server to send back. A 200 usually comes with data in the response, like the product details, but here there is none. The status 204 means "No Content," which tells the client that the request worked and the body is empty on purpose. It is a cleaner way to say "done, nothing more to show."
