@@ -7,9 +7,19 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Product::all();
+        $allowed = ['name', 'category', 'price', 'stock'];
+
+        $query = Product::query();
+
+        foreach ($allowed as $field) {
+            if ($request->filled($field)) {
+                $query->where($field, $request->query($field));
+            }
+        }
+
+        return $query->get();
     }
 
     public function store(Request $request)
